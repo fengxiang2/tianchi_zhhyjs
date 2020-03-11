@@ -110,17 +110,17 @@ def stat1(group):
 #删除异常值
 # df=df[(df['y']>4400000)&(df['y']<7000000)]
 # df=df[df['sd']<13]
-df=df.reset_index(drop=True)
+df = df.reset_index(drop=True)
   #删除报点出错的情况
-tr=df.groupby('id').size().reset_index()
-ycbd=list(tr['id'][tr[0]>1000])
+tr = df.groupby('id').size().reset_index()
+ycbd = list(tr['id'][tr[0]>1000])
 for i in ycbd:
-    qinde=df[df['id']==i].index[0]
-    hinde=df[df['id']==i].index[-1]
-    qhin=[]
+    qinde = df[df['id']==i].index[0]
+    hinde = df[df['id']==i].index[-1]
+    qhin = []
     for i in range(qinde,hinde,5):
         qhin.append(i)
-    df=df.drop(qhin,0)
+    df = df.drop(qhin,0)
 # df['x']=np.log(df['x'])
 # df['y']=np.log(df['y'])
 # sdafasd
@@ -149,7 +149,7 @@ df['wy_rate'] = abs(3600*df['wy']/df['date_diff'].dt.total_seconds())
 
 df['wy_rate'] = abs(3600*df['wy']/df['date_diff'].dt.total_seconds())
 # feat['wy_rate_mean']=df.groupby(['id'])['wy_rate'].mean()
-feat['wy_rate_max']=df.groupby(['id'])['wy_rate'].max()
+feat['wy_rate_max'] = df.groupby(['id'])['wy_rate'].max()
 # feat['wy_rate_median']=df.groupby(['id'])['wy_rate'].median()
 # feat
 
@@ -683,7 +683,7 @@ te_list.append(te)
 X_test = pd.concat(te_list,axis=1)
 X = pd.concat(tr_list,axis=1)
 
-reg=LogisticRegression(multi_class="multinomial",solver="newton-cg",max_iter=10,C=0.5)
+reg = LogisticRegression(multi_class="multinomial",solver="newton-cg",max_iter=10,C=0.5)
 reg.fit(X,y)
 pred_reg = reg.predict_proba(X_test)
 

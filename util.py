@@ -184,14 +184,14 @@ feat['x_max_x_min'] = feat['x_max'] - feat['x_min']
 feat['y_max_y_min'] = feat['y_max'] - feat['y_min']
 feat['y_max_x_min'] = feat['y_max'] - feat['x_min']
 feat['x_max_y_min'] = feat['x_max'] - feat['y_min']
-feat['slope'] =feat['y_max_y_min'] / np.where(feat['x_max_x_min']==0, 0.001, feat['x_max_x_min'])
-feat['area'] =feat['x_max_x_min'] *feat['y_max_y_min']
+feat['slope'] = feat['y_max_y_min'] / np.where(feat['x_max_x_min']==0, 0.001, feat['x_max_x_min'])
+feat['area'] = feat['x_max_x_min'] *feat['y_max_y_min']
 
 
 # In[14]:
 
 
-df=df.reset_index(drop=True)
+df = df.reset_index(drop=True)
 
 
 # In[15]:
@@ -221,11 +221,11 @@ ss = df.groupby('id')['sd'].apply(stat2)
 sf = df.groupby('id')['fx'].apply(stat2)
 
 #判断是否在有风情况下作业
-dff=df[df['sd']==0]
-dff=dff.drop_duplicates(['id','x','y'])
-dff=dff.groupby(['id']).size().reset_index()
-dff.index=dff['id']
-feat['likef']=feat['id'].map(pd.Series(dff[0]))
+dff = df[df['sd']==0]
+dff = dff.drop_duplicates(['id','x','y'])
+dff = dff.groupby(['id']).size().reset_index()
+dff.index = dff['id']
+feat['likef'] = feat['id'].map(pd.Series(dff[0]))
 
 # st = ['_'+ n for n in ['mode','max','min','mean','ptp','std','median','kurt','skew','mad']]
 st = ['_'+ n for n in ['max','mean','ptp','kurt','skew','mad']]
@@ -244,38 +244,38 @@ df
 
 
 def baiday(df0,df1,n):
-  df0[n+'sd_mean']=df0['id'].map(df1.groupby(['id'])['sd'].mean())
-  df0[n+'fx_mean']=df0['id'].map(df1.groupby(['id'])['fx'].mean())
-  df0=df0.drop_duplicates(['id'])
-  df0=df0.sort_values(['id'])
-  df0=df0.reset_index()
+  df0[n+'sd_mean'] = df0['id'].map(df1.groupby(['id'])['sd'].mean())
+  df0[n+'fx_mean'] = df0['id'].map(df1.groupby(['id'])['fx'].mean())
+  df0 = df0.drop_duplicates(['id'])
+  df0 = df0.sort_values(['id'])
+  df0 = df0.reset_index()
   return df0
 def hour(df):
-    df=df[5:7]
+    df = df[5:7]
     return int(df)
 
 def day(df):
-    df=df[2:4]
+    df = df[2:4]
     return int(df)
 
 #统计出现最多的x y等
-dxy=df.groupby(['id','x','y']).size().reset_index()
-dxy1=dxy.sort_values(['id',0],ascending=False)
-dxy1=dxy1.drop_duplicates(['id'])
-dxy1.index=dxy1['id']
-feat['x']=feat['id'].map(dxy1['x'])
-feat['y']=feat['id'].map(dxy1['y'])
-feat['x_y_cs']=feat['id'].map(dxy1[0])
+dxy = df.groupby(['id','x','y']).size().reset_index()
+dxy1 = dxy.sort_values(['id',0],ascending=False)
+dxy1 = dxy1.drop_duplicates(['id'])
+dxy1.index = dxy1['id']
+feat['x'] = feat['id'].map(dxy1['x'])
+feat['y'] = feat['id'].map(dxy1['y'])
+feat['x_y_cs'] = feat['id'].map(dxy1[0])
 
 
   #统计每个船速度为0 的个数
-df0=df[df['sd']==0]
-dfs0=df0.groupby(['id','sd']).size().reset_index()
+df0 = df[df['sd']==0]
+dfs0 = df0.groupby(['id','sd']).size().reset_index()
 dfs0.index=dfs0['id']
-feat['速度_=0']=feat['id'].map(dfs0[0])
+feat['速度_=0'] = feat['id'].map(dfs0[0])
 
-df['day']=df['time'].apply(day)
-df['hour']=df['time'].apply(hour)
+df['day'] = df['time'].apply(day)
+df['hour'] = df['time'].apply(hour)
 
 
 from sklearn.preprocessing import LabelEncoder
@@ -283,24 +283,24 @@ lbl = LabelEncoder()
 # dfd=df.drop_duplicates(['id']).reset_index()
 # feat['day']=feat['id'].map(dfd['day'])
 
-df['cx']=df['id'].map(df['id'].value_counts())
+df['cx'] = df['id'].map(df['id'].value_counts())
 
 df['x_y'] = df['x'].astype('str') + '_' + df['y'].astype('str') # 经纬度连起来代表确切地理位置
 df['x_y'] = lbl.fit_transform(df['x_y'].astype(str))
 df['x_y_count'] = df['id'].map(df.groupby('id')['x_y'].nunique().to_dict())
-df['x_y_count']=df['x_y_count']
-df0=df.copy()
-df0=df0.drop_duplicates(['id'])
-df0.index=feat['id']
+df['x_y_count'] = df['x_y_count']
+df0 = df.copy()
+df0 = df0.drop_duplicates(['id'])
+df0.index = feat['id']
 # feat['x_y']=df0['x_y']
 # feat['x_y_count']=df0['x_y_count']
 # #构造白天的数据
-bai=df[(df['hour']>=5)&(df['hour']<=19)]
-df1=baiday(df,bai,'bai_')
-df1.index=feat['id']
-feat['bai_sd_mean']=df1['bai_sd_mean']
-feat['bai_fx_mean']=df1['bai_fx_mean']
-feat['cx']=df1['cx']
+bai = df[(df['hour']>=5)&(df['hour']<=19)]
+df1 = baiday(df,bai,'bai_')
+df1.index = feat['id']
+feat['bai_sd_mean'] = df1['bai_sd_mean']
+feat['bai_fx_mean'] = df1['bai_fx_mean']
+feat['cx'] = df1['cx']
 feat
 
 

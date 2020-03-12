@@ -271,14 +271,14 @@ feat['x_y_cs'] = feat['id'].map(dxy1[0])
   #统计每个船速度为0 的个数
 df0 = df[df['sd']==0]
 dfs0 = df0.groupby(['id','sd']).size().reset_index()
-dfs0.index=dfs0['id']
+dfs0.index = dfs0['id']
 feat['速度_=0'] = feat['id'].map(dfs0[0])
 
 df['day'] = df['time'].apply(day)
 df['hour'] = df['time'].apply(hour)
 
 
-from sklearn.preprocessing import LabelEncoder
+
 lbl = LabelEncoder()
 # dfd=df.drop_duplicates(['id']).reset_index()
 # feat['day']=feat['id'].map(dfd['day'])
@@ -507,6 +507,7 @@ X = dfr[[col for col in dfr.columns if col not in ['label','id']]]
 y = dfr['label']
 y = y.map({'拖网':0,'围网':1,'刺网':2})
 
+'''
 #存储特征
 tr_list = []
 te_list = []
@@ -536,6 +537,7 @@ tr = pd.DataFrame(oof_rf,columns=['rf1','rf2','rf3'])
 te = pd.DataFrame(pred_rf,columns=['rf1','rf2','rf3'])
 tr_list.append(tr)
 te_list.append(te)
+'''
 
 #lgb
 skf = StratifiedKFold(n_splits=5, random_state=2019, shuffle=True)
@@ -584,6 +586,7 @@ oof_lgb_final = np.argmax(oof_lgb, axis=1)
 print('---------f1--final--------')
 print(f1_score(y.values, oof_lgb_final, average='macro'))
 
+'''
 tr = pd.DataFrame(oof_lgb,columns=['lgb1','lgb2','lgb3'])
 te = pd.DataFrame(pred_lgb,columns=['lgb1','lgb2','lgb3'])
 tr_list.append(tr)
@@ -686,8 +689,11 @@ X = pd.concat(tr_list,axis=1)
 reg = LogisticRegression(multi_class="multinomial",solver="newton-cg",max_iter=10,C=0.5)
 reg.fit(X,y)
 pred_reg = reg.predict_proba(X_test)
+'''
 
-pred = np.argmax(pred_reg, axis=1)
+#最终使用lgb单模
+#stacking 框架由于提交失误未得到验证
+pred = np.argmax(pred_lgb, axis=1)
 sub = pd.DataFrame()
 sub['id'] = dft.id
 sub['label'] = pred

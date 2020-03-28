@@ -13,6 +13,7 @@ from sklearn.ensemble import RandomForestClassifier
 import catboost as cbt
 import gc
 
+#可替换为相应目录
 testa_files = glob.glob("/tcdata/hy_round2_testA_20200225/*.csv")
 train_files = glob.glob("/tcdata/hy_round2_train_20200225/*.csv")
 testa_files = pd.Series(testa_files)
@@ -36,6 +37,7 @@ train.columns = ['id','x','y','sd','fx','time','label']
 test.columns = ['id','x','y','sd','fx','time']
 
 df = pd.concat([train,test],ignore_index=True)
+#删除速度异常
 df = df[df.sd<13]
 df
 
@@ -111,7 +113,7 @@ def stat1(group):
 # df=df[(df['y']>4400000)&(df['y']<7000000)]
 # df=df[df['sd']<13]
 df = df.reset_index(drop=True)
-  #删除报点出错的情况
+#针对报点过多的进行删除
 tr = df.groupby('id').size().reset_index()
 ycbd = list(tr['id'][tr[0]>1000])
 for i in ycbd:
@@ -121,6 +123,7 @@ for i in ycbd:
     for i in range(qinde,hinde,5):
         qhin.append(i)
     df = df.drop(qhin,0)
+    
 # df['x']=np.log(df['x'])
 # df['y']=np.log(df['y'])
 # sdafasd
@@ -137,6 +140,7 @@ for i in ycbd:
 #     return(df1[['id',feat+'_rate']])
 # df['x']=df['x'].astype('int')
 # df['y']=df['y'].astype('int')
+#穿的位移情况
 df['date'] = pd.to_datetime(df['time'], format='%m%d %H:%M:%S')
 df[['x_diff','y_diff','date_diff']] = df.groupby(['id']).agg({'x':'diff','y':'diff','date':'diff'})
 df['wy'] = pow(pow(df['y_diff'],2)+pow(df['x_diff'],2),0.5)
@@ -163,7 +167,7 @@ df
 # In[12]:
 
 
-
+#针对xy提取特征
 sx = df.groupby('id')['x'].apply(stat1)
 sy = df.groupby('id')['y'].apply(stat1)
 # swy = df.groupby('id')['wy'].apply(stat1)
@@ -242,7 +246,7 @@ df
 
 # In[28]:
 
-
+#提取白天的作业特征
 def baiday(df0,df1,n):
   df0[n+'sd_mean'] = df0['id'].map(df1.groupby(['id'])['sd'].mean())
   df0[n+'fx_mean'] = df0['id'].map(df1.groupby(['id'])['fx'].mean())
@@ -250,6 +254,7 @@ def baiday(df0,df1,n):
   df0 = df0.sort_values(['id'])
   df0 = df0.reset_index()
   return df0
+
 def hour(df):
     df = df[5:7]
     return int(df)
@@ -338,7 +343,7 @@ for i in ['x','y','sd','fx']:
 df['sd_bin'] = pd.cut(df.sd,[0,1,2,6,8,15],labels=False)
 
 bins = [[] for i in range(5)]
-
+#对速度进行分箱
 def get_sdbin(group):
     for i in range(5):
         c = len(group[group['sd_bin']==i])
@@ -358,6 +363,7 @@ for i in range(5):
 
 bins = [[] for i in range(5)]
 
+#每个速度分箱挡位所占的比例
 def get_sdbinr(group):
     for i in range(5):
         c = len(group[group['sd_bin']==i])
@@ -377,7 +383,7 @@ feat
 
 
 #单个样本的里的处理
-
+#差分特征
 df[['x_diff','y_diff','sd_diff','fx_diff']] = df.groupby('id').agg({
     'x':'diff',
     'y':'diff',
